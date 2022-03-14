@@ -28,7 +28,7 @@ int main(){
 	int addrlen = sizeof(cliaddr);
 
 	//create a socket
-	if((serversocket = socket(AF_INET,SOCK_STREAM,0))>0){
+	if((serversocket = socket(AF_INET,SOCK_STREAM,0))<=0){
 		printf("Error in creating socket!\n");
 		exit(EXIT_FAILURE);
 	}
@@ -40,7 +40,7 @@ int main(){
 	servaddr.sin_port = htons(SERVERPORT);
 
 	//bind the socket to the IP
-	if((bind(serversocket,(struct sockaddr*)&servaddr,sizeof(servaddr)))<=0)
+	if((bind(serversocket,(struct sockaddr*)&servaddr,sizeof(servaddr)))!=0)
 	{
 		printf("Error in binding the server socket!\n");
 		exit(EXIT_FAILURE);
@@ -48,13 +48,13 @@ int main(){
 	}
 
 	//listen for clients
-	if ((listen(serversocket,5))<=0){
+	if ((listen(serversocket,5))!=0){
 		
 		printf("Error in Listening!\n");
                 exit(EXIT_FAILURE);
 		
 	}
-	if((connfd=accept(serversocket,(struct sockaddr*)&cliaddr,&addrlen))<=0)
+	if((connfd=accept(serversocket,(struct sockaddr*)&cliaddr,&addrlen))<0)
 	{
 		printf("Error in accepting client\n");
 		exit(EXIT_FAILURE);
