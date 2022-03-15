@@ -13,24 +13,35 @@
 #define SERVERPORT 9000
 #define  BUFSIZE 10000
 
-void handle_requests(char *method,char *path,int connfd){
-	char outstr[BUFSIZE]="";
-	if(!(strcmp(method,"GET"))){
-		FILE *fp = fopen(path,"r");
-		if(fp){
-			while(fgets(outstr,BUFSIZE,fp))
-				strcat(outstr,outstr);
+void get_request(char* path,int connfd)
+{
+	char outstr[BUFSIZE];
+	FILE *fp = fopen(path,"r");
+	printf("here in handlerequests111\n");
+	if(fp){
+		while(fgets(outstr,BUFSIZE,fp)){
+			write(connfd,outstr,sizeof(outstr));
 		}
-		fclose(fp);
-		printf("%s\n",outstr);
-		write(connfd,"success ",sizeof("success"));
+	}
+		fclose(fp);	
+}
+
+void handle_requests(char *method,char *path,int connfd){
+	
+	if(!(strcmp(method,"GET"))){
+		get_request(path,connfd);	
 		
 		
 	
 	}
+	else{
+		char *resnotok = "BAD REQUEST";
+		write(connfd,resnotok,sizeof(resnotok));
+		
+	}
 }
 
-void handle_clients(int connfd){
+void handle_clients(int connfd,int serversocket){
 	char buffer[BUFSIZE];
 	char parse[BUFSIZE];
 	while(1){
@@ -48,6 +59,7 @@ void handle_clients(int connfd){
 		//printf("path = %s\n",path);
 		handle_requests(method,path,connfd);
 		//write(connfd,"success ",sizeof("success"));
+		close(serversocket);
 	}
 }
 int main(){
@@ -88,8 +100,9 @@ int main(){
 		exit(EXIT_FAILURE);
 	}
 
-	handle_clients(connfd);
-	close(serversocket);
+	handle_clients(connfd,serversocket);
+	
+	
 
 
 }
