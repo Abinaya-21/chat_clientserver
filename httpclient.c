@@ -15,7 +15,7 @@ void chat_withserver(int sockfd)
 	int n;
 	while(1) {
 		memset(buff,0, sizeof(buff));
-		printf("Enter the string : ");
+		printf("\nEnter the Request: ");
 		n = 0;
 		while ((buff[n++] = getchar()) != '\n')
 			;

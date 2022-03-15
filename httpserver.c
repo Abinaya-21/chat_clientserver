@@ -13,32 +13,47 @@
 #define SERVERPORT 9000
 #define  BUFSIZE 10000
 
+char error404[] = "404 NOT FOUND";
+char *suc200 = "200 OK";
+char *suc201 = "201 CREATED";
+char *error400 = "400 BAD REQUEST";
 void get_request(char* path,int connfd)
+
 {
 	char outstr[BUFSIZE];
 	FILE *fp = fopen(path,"r");
-	printf("here in handlerequests111\n");
 	if(fp){
 		while(fgets(outstr,BUFSIZE,fp)){
 			write(connfd,outstr,sizeof(outstr));
 		}
+		fclose(fp);
 	}
-		fclose(fp);	
+		
+	else {
+
+		write(connfd,error404,sizeof(error404));
+	}
+	
+		
 }
+
+void put_request(char* path,int connfd){}
+void delete_request(char* path,int connfd){}
+void post_request(char* path,int connfd){}
 
 void handle_requests(char *method,char *path,int connfd){
 	
-	if(!(strcmp(method,"GET"))){
+	if(!(strcmp(method,"GET")))
 		get_request(path,connfd);	
-		
-		
-	
-	}
-	else{
-		char *resnotok = "BAD REQUEST";
-		write(connfd,resnotok,sizeof(resnotok));
-		
-	}
+	else if(!(strcmp(method,"POST")))
+		post_request(path,connfd);
+	else if(!(strcmp(method,"PUT")))
+		put_request(path,connfd);
+	else if(!(strcmp(method,"DELETE")))
+		delete_request(path,connfd);	
+	else
+		write(connfd,error400,sizeof(error400));
+
 }
 
 void handle_clients(int connfd,int serversocket){
