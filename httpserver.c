@@ -13,13 +13,41 @@
 #define SERVERPORT 9000
 #define  BUFSIZE 10000
 
+void handle_requests(char *method,char *path,int connfd){
+	char outstr[BUFSIZE]="";
+	if(!(strcmp(method,"GET"))){
+		FILE *fp = fopen(path,"r");
+		if(fp){
+			while(fgets(outstr,BUFSIZE,fp))
+				strcat(outstr,outstr);
+		}
+		fclose(fp);
+		printf("%s\n",outstr);
+		write(connfd,"success ",sizeof("success"));
+		
+		
+	
+	}
+}
+
 void handle_clients(int connfd){
 	char buffer[BUFSIZE];
+	char parse[BUFSIZE];
 	while(1){
 		memset(buffer,0,BUFSIZE);
 		read(connfd,buffer,sizeof(buffer));
-		printf("client Request:\n %s",buffer);
-		write(connfd,"success",sizeof("success"));
+		strcpy(parse,buffer);
+		printf("client Request:\n %s",parse);
+		char *method = strtok(buffer," ");
+		printf("Method = %s\n",method);
+		int i=0;
+		while(buffer[i++]!='/');
+		//printf("%d",i);
+		//printf("%c",*(buffer+i));
+		char *path = strtok(buffer+i," ");
+		//printf("path = %s\n",path);
+		handle_requests(method,path,connfd);
+		//write(connfd,"success ",sizeof("success"));
 	}
 }
 int main(){
