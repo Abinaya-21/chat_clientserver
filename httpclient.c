@@ -6,6 +6,8 @@
 #include <fcntl.h>
 #include<unistd.h>
 #include<arpa/inet.h>
+
+
 #define BUFSIZE  10000
 #define PORT 9000
 
@@ -20,7 +22,7 @@ void chat_withserver(int sockfd)
 		while ((buff[n++] = getchar()) != '\n')
 			;
 		write(sockfd, buff, sizeof(buff));
-		bzero(buff, sizeof(buff));
+		memset(buff,0, sizeof(buff));
 		read(sockfd, buff, sizeof(buff));
 		printf("From Server : %s", buff);
 		/*if ((strncmp(buff, "exit", 4)) == 0) {
@@ -48,7 +50,6 @@ int main()
 	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	servaddr.sin_port = htons(PORT);
 
-	// connect the client socket to server socket
 	if (connect(clientsocket, (struct sockaddr*)&servaddr, sizeof(servaddr)) != 0) {
 		printf("connection with the server failed...\n");
 		exit(EXIT_FAILURE);
@@ -56,10 +57,9 @@ int main()
 	else
 		printf("connected to the server..\n");
 
-	// function for chat
 	chat_withserver(clientsocket);
 
-	// close the socket
+
 	close(clientsocket);
 }
 
