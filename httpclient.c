@@ -19,15 +19,14 @@ void chat_withserver(int sockfd)
 	int n;
 	while(1) {
 		memset(buff,0, sizeof(buff));
-		recv(sockfd,ack,sizeof(ack),0);
-		printf("\nEnter the Request: ");
-		n = 0;
-		while ((buff[n++] = getchar()) != '\n')
-			;
+
+		printf("\nEnter the HTTP Request: ");
+		fgets(buff,BUFSIZE,stdin);
+		
 		char *method = strtok(buff," ");
 		if(method == "GET")
 			strcat(buff,headers);
-		else if (method == "post"){
+		else if (method == "POST"){
 			strcat(buff,headers);
 			printf("\n Enter Username : ");
 			n=0;
