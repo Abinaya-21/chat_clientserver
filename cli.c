@@ -63,7 +63,7 @@ int main()
 			if(FD_ISSET(i, &read_fds)){
 				//if present
 				if (i == 0){
-					printf("%d \n",i);
+					//printf("%d \n",i);
 					memset(send_buf,BUFSIZE,0);//clearing the send buffer
 					memset(temp,BUFSIZE,0);//clearing the temp buffer
 					fgets(temp, BUFSIZE, stdin); // get the message from standard input;
@@ -75,7 +75,7 @@ int main()
 					memset(temp,BUFSIZE,0);//clearing the temp buffer
 				}
 				else {
-					printf("%d \n",i);
+					//printf("%d \n",i);
 					
 					memset(recv_buf , 0, BUFSIZE);
 					bytes = recv(sockfd, recv_buf, BUFSIZE, 0); // receive the message

@@ -13,6 +13,7 @@
 
 int bytes;
 char recv_buf[BUFSIZE];
+char temp[BUFSIZE];
 char buf[BUFSIZE];
 
 			
@@ -105,10 +106,26 @@ int main()
 							if (FD_ISSET(j, &master)){
 								//message should be forwarded only to other clients
 								if (j != sockfd && j != i) {
-									//memset(recv_buf,0,BUFSIZE);
-									if (send(j, recv_buf, bytes, 0) == -1) 
+									//removing http headers and sending the body
+									int k=0,l=0;
+									char method[10];
+									while(recv_buf[k]!=' '){
+										method[k] = recv_buf[k];
+										++k;}
+									method[k] = '\0';
+									printf("recv from socket: %d - %s\n",j,recv_buf);
+									//printf("%s",method);
+									if(!(strcmp(method,"POST"))){
+										
+										char *body = strstr(recv_buf,"\r\n\r\n");
+										//printf("ret = %s\n",(ret+4));
+										body = body+4;
+										
+										//printf("temp : %s\n",temp);
+										if (send(j, body, bytes, 0) == -1) 
 											printf("Error in sending the messages.\n");
-									memset(recv_buf,0,BUFSIZE);
+										memset(recv_buf,0,BUFSIZE);
+									}	
 			
 								}
 							}
