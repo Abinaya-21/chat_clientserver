@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 	
-#define SERVERPORT 5000
+#define SERVERPORT 5500
 #define BUFSIZE 2000
 
 int bytes;

@@ -8,11 +8,13 @@
 #include <unistd.h>
 	
 #define BUFSIZE 2000
-#define SERVERPORT 5000
+#define SERVERPORT 5500
 
 char send_buf[BUFSIZE]; // a buffer to store the sending mesaages
 char recv_buf[BUFSIZE]; // buffer to store received messages
+char temp[BUFSIZE];
 int bytes;	
+char *headers = "POST /client HTTP/1.1\nHost - Mycomputer\nContent-Type - application/txt\nContent-Length - 2000\r\n\r\n";
 
 	
 int main()
@@ -61,12 +63,20 @@ int main()
 			if(FD_ISSET(i, &read_fds)){
 				//if present
 				if (i == 0){
+					printf("%d \n",i);
 					memset(send_buf,BUFSIZE,0);//clearing the send buffer
-					fgets(send_buf, BUFSIZE, stdin); // get the message from standard input;	
+					memset(temp,BUFSIZE,0);//clearing the temp buffer
+					fgets(temp, BUFSIZE, stdin); // get the message from standard input;
+					strcat(send_buf,headers);
+					strcat(send_buf,temp);
+					
 					send(sockfd, send_buf, strlen(send_buf), 0);//send the message 
 					memset(send_buf,BUFSIZE,0);
+					memset(temp,BUFSIZE,0);//clearing the temp buffer
 				}
 				else {
+					printf("%d \n",i);
+					
 					memset(recv_buf , 0, BUFSIZE);
 					bytes = recv(sockfd, recv_buf, BUFSIZE, 0); // receive the message
 					recv_buf[bytes] = '\0'; //terminate the string

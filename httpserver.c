@@ -43,7 +43,8 @@ void get_request(char* path,int connfd)
 
 void post_request(char* path,int connfd){
 	memset(outstr,0,BUFSIZE);
-	recv(connfd,outstr,sizeof(outstr),0);
+	int rbytes = recv(connfd,outstr,sizeof(outstr),0);
+	outstr[rbytes-1] = '\0';
 	FILE *fp;
 	fp = fopen(path,"w");
 	fprintf(fp,outstr);
@@ -78,7 +79,7 @@ void handle_requests(char *method,char *path,int connfd){
 
 void handle_clients(int connfd,char clientAddr[CLIADDRLEN]){
 	char buffer[BUFSIZE];
-	//char parse[BUFSIZE];
+	
 	while(1){
 		memset(buffer,0,BUFSIZE);
 		if((recv(connfd,buffer,sizeof(buffer),0))<0){
@@ -148,10 +149,8 @@ int main(){
 		
 
 		inet_ntop(AF_INET,&(cliaddr.sin_addr),clientAddr,CLIADDRLEN);
-		if((childpid = fork())==0){
-			close(serversocket);
-			handle_clients(connfd,clientAddr);
-			}
+		
+		handle_clients(connfd,clientAddr);
 			
 			
 		close(connfd);
