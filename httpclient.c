@@ -11,24 +11,43 @@
 #define BUFSIZE  10000
 #define PORT 9000
 
+char *headers = "Host - Mycomputer\nContent-Type - application/txt \nContent-Length - 1000\n\n";
+
 void chat_withserver(int sockfd)
 {
-	char buff[BUFSIZE];
+	char buff[BUFSIZE],user[20],pass[20],ack[100];
 	int n;
 	while(1) {
 		memset(buff,0, sizeof(buff));
+		recv(sockfd,ack,sizeof(ack),0);
 		printf("\nEnter the Request: ");
 		n = 0;
 		while ((buff[n++] = getchar()) != '\n')
 			;
-		write(sockfd, buff, sizeof(buff));
+		char *method = strtok(buff," ");
+		if(method == "GET")
+			strcat(buff,headers);
+		else if (method == "post"){
+			strcat(buff,headers);
+			printf("\n Enter Username : ");
+			n=0;
+			while ((user[n++] = getchar()) != '\n')
+			;
+			strcat(buff,user);
+			printf("\n Enter Password : ");
+			n=0;
+			while ((pass[n++] = getchar()) != '\n')
+			;
+			strcat(buff,pass);
+			
+			
+		}
+		send(sockfd, buff, sizeof(buff),0);
+		
 		memset(buff,0, sizeof(buff));
-		read(sockfd, buff, sizeof(buff));
+		recv(sockfd, buff, sizeof(buff),0);
 		printf("From Server : %s", buff);
-		/*if ((strncmp(buff, "exit", 4)) == 0) {
-			printf("Client Exit...\n");
-			break;
-		}*/
+		
 	}
 }
 
