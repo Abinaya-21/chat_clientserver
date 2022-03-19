@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 	
-#define BUFSIZE 2000
+#define BUFSIZE 500
 #define SERVERPORT 5500
 
 char send_buf[BUFSIZE]; // a buffer to store the sending mesaages
@@ -66,9 +66,8 @@ int main()
 					memset(send_buf,BUFSIZE,0);//clearing the send buffer
 					memset(temp,BUFSIZE,0);//clearing the temp buffer
 					fgets(temp, BUFSIZE, stdin); // get the message from standard input;
-					strcat(send_buf,headers);
-					strcat(send_buf,temp);
-					
+					strcat(send_buf,headers); // add the headers 
+					strcat(send_buf,temp); // add the msg with the header 
 					send(sockfd, send_buf, strlen(send_buf), 0);//send the message 
 					memset(send_buf,BUFSIZE,0);
 					memset(temp,BUFSIZE,0);//clearing the temp buffer
@@ -78,12 +77,11 @@ int main()
 					
 					memset(recv_buf , 0, BUFSIZE);
 					bytes = recv(sockfd, recv_buf, BUFSIZE, 0); // receive the message
+					if(bytes == 0){
+						printf("Server disconnected\n");
+						exit(EXIT_FAILURE);
+						}
 					recv_buf[bytes] = '\0'; //terminate the string
-					//removing the HTTP response headers
-					//char *body = strstr(recv_buf,"\r\n\r\n");
-					//body = body+4;
-					//char *tru = strstr(recv_buff,"HTTP/1.1");
-					//if(*tru)
 					printf("%s\n" , recv_buf);
 					memset(recv_buf, 0, BUFSIZE);//clearing the recv_buffer
 					fflush(stdout); //clear the standard output

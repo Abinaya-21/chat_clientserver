@@ -9,15 +9,13 @@
 #include <netdb.h>
 	
 #define SERVERPORT 5500
-#define BUFSIZE 2000
+#define BUFSIZE 500
 
 char suc201[BUFSIZE] = "HTTP/1.1 201 sent\nServer - Mycomputer\nContent-Type - application/txt\nContent-Length - 2000\r\n\r\n";
 
 int bytes;
 char recv_buf[BUFSIZE];
-//char temp[BUFSIZE];
-//char buf[BUFSIZE];
-
+char temp[BUFSIZE];
 			
 
 int main()
@@ -90,7 +88,7 @@ int main()
 					}
 				}
 				else{
-					memset(recv_buf,0,BUFSIZE);
+					memset(recv_buf,0,BUFSIZE); /
 					if ((bytes = recv(i, recv_buf, BUFSIZE, 0)) <= 0) {
 						if (bytes == 0) 
 							printf("connection from %s on port %d is disconnected. \n",
@@ -103,29 +101,34 @@ int main()
 					}	
 					else {
 						 recv_buf[bytes-1]='\0';
-						// forward te messages to the other clients
-						int j;
-						//send
-						int k=0,l=0;
+						
+						int k=0,l=0,j;
 						char method[10];
-						char *body;
+						char body[BUFSIZE];
 						while(recv_buf[k]!=' '){
 							method[k] = recv_buf[k];
 							++k;}
 						method[k] = '\0';
 						if(!(strcmp(method,"POST"))){
-										
-							body = strstr(recv_buf,"\r\n\r\n");
-							body = body+4;
-							//printf("body = %s",body);
+							//if the method is post , get the request body
+							int x=0;
+							while(recv_buf[x]!='\r')
+								++x;
+							x+=4;
+							while(recv_buf[x] != '\0'){
+							body[l] = recv_buf[x];
+							++x;
+							++l;
+							}
+							
+							body[l]='\0';
 							for(j = 0; j <= fdmax; j++){
 							//checking whether the fd is in the list
 								if (FD_ISSET(j, &master)){
 								//message should be forwarded only to other clients
 								
 									if (j != sockfd && j != i) {
-									//removing http headers and sending the body
-									//printf("body2:%s",body);
+									  	// forward the messages to the other clients
 										if (send(j, body, sizeof(body), 0) == -1) 	
 											printf("Error in sending the messages.\n");	
 										}
