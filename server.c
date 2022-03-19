@@ -15,8 +15,8 @@ char suc201[BUFSIZE] = "HTTP/1.1 201 sent\nServer - Mycomputer\nContent-Type - a
 
 int bytes;
 char recv_buf[BUFSIZE];
-char temp[BUFSIZE];
-char buf[BUFSIZE];
+//char temp[BUFSIZE];
+//char buf[BUFSIZE];
 
 			
 
@@ -102,50 +102,48 @@ int main()
 					FD_CLR(i, &master); // clear the file descriptor in the set
 					}	
 					else {
-						 
+						 recv_buf[bytes-1]='\0';
 						// forward te messages to the other clients
 						int j;
 						//send
-						for(j = 0; j <= fdmax; j++){
+						int k=0,l=0;
+						char method[10];
+						char *body;
+						while(recv_buf[k]!=' '){
+							method[k] = recv_buf[k];
+							++k;}
+						method[k] = '\0';
+						if(!(strcmp(method,"POST"))){
+										
+							body = strstr(recv_buf,"\r\n\r\n");
+							body = body+4;
+							//printf("body = %s",body);
+							for(j = 0; j <= fdmax; j++){
 							//checking whether the fd is in the list
-							if (FD_ISSET(j, &master)){
+								if (FD_ISSET(j, &master)){
 								//message should be forwarded only to other clients
-								if (j != sockfd && j != i) {
+								
+									if (j != sockfd && j != i) {
 									//removing http headers and sending the body
-									int k=0,l=0;
-									char method[10];
-									while(recv_buf[k]!=' '){
-										method[k] = recv_buf[k];
-										++k;}
-									method[k] = '\0';
-									printf("Received from Client on socket: %d\n  													%s\n",i,recv_buf);
-									if(!(strcmp(method,"POST"))){
-									
-										memset(temp,0,BUFSIZE);
-										
-										char *body = strstr(recv_buf,"\r\n\r\n");
-										body = body+4;
-										strcat(temp,suc201);
-										strcat(temp,body);
-										printf("Sent to client on socket %d\n %s",j,temp);
-										
-										if (send(j, temp, sizeof(temp), 0) == -1) 
-											printf("Error in sending the messages.\n");
-									memset(method,0,sizeof(method));
-																				
+									//printf("body2:%s",body);
+										if (send(j, body, sizeof(body), 0) == -1) 	
+											printf("Error in sending the messages.\n");	
+										}
+									else if(i==j){
+										//sending the response header to the client which sent the request
+										send(j,suc201,sizeof(suc201),0);
 									}	
-			
 								}
-							}
 							
-						}
+							}
 		
-					}
+						}
 					
+					}
+			
 				}
 			}
-			
 		}
 	}
 	return 0;
-}
+}//main

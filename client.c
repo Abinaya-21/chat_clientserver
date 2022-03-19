@@ -80,9 +80,11 @@ int main()
 					bytes = recv(sockfd, recv_buf, BUFSIZE, 0); // receive the message
 					recv_buf[bytes] = '\0'; //terminate the string
 					//removing the HTTP response headers
-					char *body = strstr(recv_buf,"\r\n\r\n");
-					body = body+4;
-					printf("%s" , body);
+					//char *body = strstr(recv_buf,"\r\n\r\n");
+					//body = body+4;
+					//char *tru = strstr(recv_buff,"HTTP/1.1");
+					//if(*tru)
+					printf("%s\n" , recv_buf);
 					memset(recv_buf, 0, BUFSIZE);//clearing the recv_buffer
 					fflush(stdout); //clear the standard output
 				}
