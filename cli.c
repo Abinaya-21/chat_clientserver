@@ -59,11 +59,10 @@ int main()
 		}
 		
 		for(i=0; i <= fdmax; i++ )
-			//checking whether i is in the read fds set
+			//checking whether socket fd i is in the active read fds set
 			if(FD_ISSET(i, &read_fds)){
 				//if present
 				if (i == 0){
-					//printf("%d \n",i);
 					memset(send_buf,BUFSIZE,0);//clearing the send buffer
 					memset(temp,BUFSIZE,0);//clearing the temp buffer
 					fgets(temp, BUFSIZE, stdin); // get the message from standard input;
@@ -80,7 +79,10 @@ int main()
 					memset(recv_buf , 0, BUFSIZE);
 					bytes = recv(sockfd, recv_buf, BUFSIZE, 0); // receive the message
 					recv_buf[bytes] = '\0'; //terminate the string
-					printf("%s\n" , recv_buf);
+					//removing the HTTP response headers
+					char *body = strstr(recv_buf,"\r\n\r\n");
+					body = body+4;
+					printf("%s" , body);
 					memset(recv_buf, 0, BUFSIZE);//clearing the recv_buffer
 					fflush(stdout); //clear the standard output
 				}

@@ -115,9 +115,9 @@ int main()
 										method[k] = recv_buf[k];
 										++k;}
 									method[k] = '\0';
-									printf("recv from socket: %d - %s\n",j,recv_buf);
-									//printf("%s",method);
+									printf("Received from Client on socket: %d\n  %s\n",i,recv_buf);
 									if(!(strcmp(method,"POST"))){
+									
 										memset(temp,0,BUFSIZE);
 										
 										char *body = strstr(recv_buf,"\r\n\r\n");
@@ -125,15 +125,15 @@ int main()
 										//memset(recv_buf,0,BUFSIZE);
 										strcat(temp,suc201);
 										strcat(temp,body);
-										printf("recv: %s",temp);
-										//temp[strlen(temp)-1] = '\0';
+										printf("Sent to client on socket %d\n %s",j,temp);
 										
 										if (send(j, temp, strlen(temp), 0) == -1) 
 											printf("Error in sending the messages.\n");
-										//printf("I am here");
-										//memset(recv_buf,0,BUFSIZE);
-										//memset(body,0,BUFSIZE);
-										//memset(temp,0,BUFSIZE);
+									
+										memset(recv_buf,0,BUFSIZE);
+																				
+									}
+									else{
 										
 									}	
 			
