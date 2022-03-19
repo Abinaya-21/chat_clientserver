@@ -11,6 +11,8 @@
 #define SERVERPORT 5500
 #define BUFSIZE 2000
 
+char suc201[BUFSIZE] = "HTTP/1.1 201 sent\nServer - Mycomputer\nContent-Type - application/txt\nContent-Length - 2000\r\n\r\n";
+
 int bytes;
 char recv_buf[BUFSIZE];
 char temp[BUFSIZE];
@@ -116,15 +118,23 @@ int main()
 									printf("recv from socket: %d - %s\n",j,recv_buf);
 									//printf("%s",method);
 									if(!(strcmp(method,"POST"))){
+										memset(temp,0,BUFSIZE);
 										
 										char *body = strstr(recv_buf,"\r\n\r\n");
-										//printf("ret = %s\n",(ret+4));
 										body = body+4;
+										//memset(recv_buf,0,BUFSIZE);
+										strcat(temp,suc201);
+										strcat(temp,body);
+										printf("recv: %s",temp);
+										//temp[strlen(temp)-1] = '\0';
 										
-										//printf("temp : %s\n",temp);
-										if (send(j, body, bytes, 0) == -1) 
+										if (send(j, temp, strlen(temp), 0) == -1) 
 											printf("Error in sending the messages.\n");
-										memset(recv_buf,0,BUFSIZE);
+										//printf("I am here");
+										//memset(recv_buf,0,BUFSIZE);
+										//memset(body,0,BUFSIZE);
+										//memset(temp,0,BUFSIZE);
+										
 									}	
 			
 								}
