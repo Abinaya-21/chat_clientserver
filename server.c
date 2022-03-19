@@ -90,6 +90,7 @@ int main()
 					}
 				}
 				else{
+					memset(recv_buf,0,BUFSIZE);
 					if ((bytes = recv(i, recv_buf, BUFSIZE, 0)) <= 0) {
 						if (bytes == 0) 
 							printf("connection from %s on port %d is disconnected. \n",
@@ -100,9 +101,11 @@ int main()
 					close(i); // close the connection
 					FD_CLR(i, &master); // clear the file descriptor in the set
 					}	
-					else { 
+					else {
+						 
 						// forward te messages to the other clients
 						int j;
+						//send
 						for(j = 0; j <= fdmax; j++){
 							//checking whether the fd is in the list
 							if (FD_ISSET(j, &master)){
@@ -115,26 +118,21 @@ int main()
 										method[k] = recv_buf[k];
 										++k;}
 									method[k] = '\0';
-									printf("Received from Client on socket: %d\n  %s\n",i,recv_buf);
+									printf("Received from Client on socket: %d\n  													%s\n",i,recv_buf);
 									if(!(strcmp(method,"POST"))){
 									
 										memset(temp,0,BUFSIZE);
 										
 										char *body = strstr(recv_buf,"\r\n\r\n");
 										body = body+4;
-										//memset(recv_buf,0,BUFSIZE);
 										strcat(temp,suc201);
 										strcat(temp,body);
 										printf("Sent to client on socket %d\n %s",j,temp);
 										
-										if (send(j, temp, strlen(temp), 0) == -1) 
+										if (send(j, temp, sizeof(temp), 0) == -1) 
 											printf("Error in sending the messages.\n");
-									
-										memset(recv_buf,0,BUFSIZE);
+									memset(method,0,sizeof(method));
 																				
-									}
-									else{
-										
 									}	
 			
 								}
@@ -143,8 +141,10 @@ int main()
 						}
 		
 					}
+					
 				}
 			}
+			
 		}
 	}
 	return 0;
