@@ -14,7 +14,11 @@ char send_buf[BUFSIZE]; // a buffer to store the sending mesaages
 char recv_buf[BUFSIZE]; // buffer to store received messages
 char temp[BUFSIZE];
 int bytes;	
-char *headers = "POST /client HTTP/1.1\nHost - Mycomputer\nContent-Type - application/txt\nContent-Length - 2000\r\n\r\n";
+//char *headers = "POST /client HTTP/1.1\nHost - Mycomputer\nContent-Type - text/plain \nContent-Length - 2000\r\n\r\n";
+char *headers = "POST /client HTTP/1.1\nHost - Mycomputer\n";
+int conlen;
+char contype[] = "Content-Type - text/plain \n";
+char linebreak[] = "\r\n\r\n";
 
 	
 int main()
@@ -63,18 +67,23 @@ int main()
 			if(FD_ISSET(i, &read_fds)){
 				//if present
 				if (i == 0){
+					char contlen[30];
 					memset(send_buf,BUFSIZE,0);//clearing the send buffer
 					memset(temp,BUFSIZE,0);//clearing the temp buffer
 					fgets(temp, BUFSIZE, stdin); // get the message from standard input;
-					strcat(send_buf,headers); // add the headers 
+					conlen = strlen(temp); //update the content length as length of the msg
+					sprintf(contlen,"Content-Length -%d\n",conlen);
+					//construct the http request headers
+					strcat(send_buf,headers); 
+					strcat(send_buf,contlen);
+					strcat(send_buf, contype);
+					strcat(send_buf,linebreak);
 					strcat(send_buf,temp); // add the msg with the header 
 					send(sockfd, send_buf, strlen(send_buf), 0);//send the message 
 					memset(send_buf,BUFSIZE,0);
 					memset(temp,BUFSIZE,0);//clearing the temp buffer
 				}
 				else {
-					//printf("%d \n",i);
-					
 					memset(recv_buf , 0, BUFSIZE);
 					bytes = recv(sockfd, recv_buf, BUFSIZE, 0); // receive the message
 					if(bytes == 0){

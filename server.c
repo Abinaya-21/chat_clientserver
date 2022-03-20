@@ -11,11 +11,14 @@
 #define SERVERPORT 5500
 #define BUFSIZE 500
 
-char suc201[BUFSIZE] = "HTTP/1.1 201 sent\nServer - Mycomputer\nContent-Type - application/txt\nContent-Length - 2000\r\n\r\n";
-
+char suc201[BUFSIZE] = "201 sent\nServer - Mycomputer\nContent-Type - application/txt\nContent-Length - 2000\r\n\r\n";
 int bytes;
 char recv_buf[BUFSIZE];
 char temp[BUFSIZE];
+char *headers = "201 sent\nServer - Mycomputer\n";
+int conlen;
+char contype[] = "Content-Type - text/plain \n";
+char linebreak[] = "\r\n\r\n";
 			
 
 int main()
@@ -83,12 +86,13 @@ int main()
 						if(newsockfd > fdmax){
 							fdmax = newsockfd; // updating the maximum val of file descriptor
 						}
-					printf("New connection from %s on port %d \n",
+					printf("\nNew connection from %s on port %d \n",
 					inet_ntoa(client_addr.sin_addr),ntohs(client_addr.sin_port));
 					}
 				}
 				else{
-					memset(recv_buf,0,BUFSIZE); /
+					memset(recv_buf,0,BUFSIZE); 
+					memset(temp,0,BUFSIZE); 
 					if ((bytes = recv(i, recv_buf, BUFSIZE, 0)) <= 0) {
 						if (bytes == 0) 
 							printf("connection from %s on port %d is disconnected. \n",
@@ -100,8 +104,8 @@ int main()
 					FD_CLR(i, &master); // clear the file descriptor in the set
 					}	
 					else {
-						 recv_buf[bytes-1]='\0';
-						
+						recv_buf[bytes-1]='\0';
+						printf("\nRequest from client %d \n%s",i,recv_buf);
 						int k=0,l=0,j;
 						char method[10];
 						char body[BUFSIZE];
@@ -134,7 +138,15 @@ int main()
 										}
 									else if(i==j){
 										//sending the response header to the client which sent the request
-										send(j,suc201,sizeof(suc201),0);
+										char contlen[30];
+										conlen = strlen(body);; //update the content length as length of the msg
+										sprintf(contlen,"Content-Length -%d\n",conlen);
+										//construct the reponse headers
+										strcat(temp,headers); // add the headers
+										strcat(temp,contlen);
+										strcat(temp, contype);
+										strcat(temp,linebreak);
+										send(j,temp,sizeof(temp),0);
 									}	
 								}
 							
